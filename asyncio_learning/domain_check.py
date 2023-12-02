@@ -11,6 +11,17 @@ async def test(addr: str):
     except socket.gaierror as e:
         print(f"Domena {addr} nie istnieje")
 
+async def sleeper(n: int):
+    print(f"zaczynam {n}")
+    await asyncio.sleep(n)
+    print(f"Koncze {n}")
+    return n
+
+async def main1():
+    coros = [sleeper(3), sleeper(5), sleeper(9), sleeper(1)]
+    for coro in asyncio.as_completed(coros):
+        res = await coro
+
 
 async def main():
     domains = [f"{d}.pl".lower() for d in kwlist]
@@ -20,4 +31,4 @@ async def main():
         await coro
 
 
-asyncio.run(main())
+asyncio.run(main1())
