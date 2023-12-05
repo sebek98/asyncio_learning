@@ -1,20 +1,28 @@
 import asyncio
-import time
 
 
 async def echo_server(address):
-    server = await asyncio.start_server(primes_server, *address)
+    server = await asyncio.start_server(echo_handler, *address)
     async with server:
         await server.serve_forever()
 
 
-async def primes_server(reader, writer):
+async def echo_handler(reader, writer):
     while True:
         data = await reader.read(10000)
-        prime_to_test = int(data.decode())
-        primes = primes_up_to(prime_to_test)
-        writer.write(f"{primes}\n".encode("utf-8"))
+        try:
+            prime_to_test = int(data)
+        except ValueError:
+            continue
+        ## code CPU invensive here - not working, blocking the loop
+        # res = primes_up_to(prime_to_test)
+        res = await asyncio.to_thread(primes_up_to, prime_to_test)
+        ## CPU intensive was there
+        writer.write(f"{res}\n".encode("utf-8"))
         await writer.drain()
+    print("conn closed")
+    writer.close()
+    await writer.wait_closed()
 
 
 def is_prime(n):
