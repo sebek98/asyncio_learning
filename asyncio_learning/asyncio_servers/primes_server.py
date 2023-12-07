@@ -1,5 +1,8 @@
 import asyncio
+from concurrent.futures import ProcessPoolExecutor
 
+
+pool = ProcessPoolExecutor(max_workers=8)
 
 async def echo_server(address):
     server = await asyncio.start_server(echo_handler, *address)
@@ -15,8 +18,14 @@ async def echo_handler(reader, writer):
         except ValueError:
             continue
         ## code CPU invensive here - not working, blocking the loop
+        #1
         # res = primes_up_to(prime_to_test)
-        res = await asyncio.to_thread(primes_up_to, prime_to_test)
+        #2
+        # res = await asyncio.to_thread(primes_up_to, prime_to_test)
+        #3
+        #
+        loop = asyncio.get_running_loop()
+        res = await loop.run_in_executor(pool, primes_up_to, prime_to_test)
         ## CPU intensive was there
         writer.write(f"{res}\n".encode("utf-8"))
         await writer.drain()

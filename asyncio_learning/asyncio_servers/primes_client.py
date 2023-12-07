@@ -4,7 +4,7 @@ import asyncio
 async def echo_prime_up_to(address):
     while True:
         reader, writer = await asyncio.open_connection(*address)
-        writer.write(b'100000')
+        writer.write(b'1000')
         await writer.drain()
         resp = await reader.read(10000)
         print(resp.decode())
