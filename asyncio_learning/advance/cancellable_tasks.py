@@ -10,8 +10,7 @@ async def coro(delay):
         print(f"coro({delay}) done")
 
 
-async def main():
-    # coros = [coro(i) for i in range(1,5)]
+async def main_sigle_coro():
     print("launching coro")
     task = asyncio.create_task(coro(5))
     await asyncio.sleep(2)
@@ -19,4 +18,16 @@ async def main():
     await task
 
 
-asyncio.run(main())
+async def main_multiple_coro():
+    coros = [coro(i) for i in range(1,5)]
+    print("launching coro")
+    tasks = asyncio.gather(*coros) # this is a task which creates courutines
+    await asyncio.sleep(1)
+    tasks.cancel()
+    try:
+        await tasks
+    except asyncio.CancelledError:
+        print("Gather task is cancelled")
+
+
+asyncio.run(main_multiple_coro())
