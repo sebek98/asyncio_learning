@@ -29,3 +29,11 @@ async def test_async_file_content():
             res = await f.read()
             assert res == file_content
 
+@pytest.mark.asyncio
+async def test_async_file_line_by_line_content():
+    with mock.patch('builtins.open', mock.mock_open(read_data=file_content)):
+        async with AsyncFile("zupa.py") as f:
+            res = []
+            async for line in f:
+                res.append(line.strip())
+            assert res == file_content.split("\n")

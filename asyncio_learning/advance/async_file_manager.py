@@ -15,6 +15,14 @@ class AsyncFile:
         # can be blocking
         await asyncio.to_thread(self.file.close)
 
+    async def __aiter__(self):
+        for line in self.file:
+            if not line: break
+            yield line
+
+    async def __anext__(self):
+        pass
+
     async def read(self):
         # can be blocking
         return await asyncio.to_thread(self.file.read)
